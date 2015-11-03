@@ -18,6 +18,7 @@ class mystring {
 
     int set(char* str, size_t n);
     int hash(size_t size=5);
+    int length(){ return _size; }
 
     // functions that spec required
     int frequency(const mystring &str);
@@ -35,6 +36,7 @@ class mystring {
     size_t _size;
     void reallocate();
     char& at(int i);
+
 };
 
 #endif // MYSTRING_H_
