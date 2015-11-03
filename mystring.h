@@ -35,7 +35,10 @@ class mystring {
     char* _end;
     size_t _size;
     void reallocate();
-    char& at(int i);
+    char& at(int i) const;
+    static const int _MOD = 1007;
+    int _rolling_checksum_a(size_t len);
+    int _rolling_checksum_b(size_t len);
 
 };
 

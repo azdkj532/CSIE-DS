@@ -22,7 +22,32 @@ int mystring::set(char* str, size_t n) {
     return 0;
 }
 
-char& mystring::at(int i)
+int mystring::_rolling_checksum_a(size_t length)
+{
+    int sum = 0;
+    for (int i = 0; i < length; i++) {
+        sum += at(i);
+    }
+    return sum;
+}
+
+int mystring::_rolling_checksum_b(size_t length)
+{
+    int sum = 0;
+    for (int i = 0; i < length ; i++) {
+        sum += (length - i) * at(i);
+    }
+    return sum;
+}
+
+int mystring::frequency(const mystring& str)
+{
+    int find = 0, rolling_a = 0, rolling_b = 0;
+    int str_rolling_a = 0, str_rolling_b = 0;
+
+}
+
+char& mystring::at(int i) const
 {
     if (i >= 0) {
         assert(_data + i < _end);
