@@ -4,7 +4,8 @@
 
 #include "./mystring.h"
 
-void mystring::reallocate() {
+void mystring::reallocate() 
+{
     size_t _new_size = _size << 1;
     assert(_new_size >> 1 == _size);
     char* _new_data = new char[_new_size];
@@ -21,3 +22,23 @@ int mystring::set(char* str, size_t n) {
     return 0;
 }
 
+char& mystring::at(int i)
+{
+    if (i >= 0) {
+        assert(_data + i < _end);
+        return *(_data + i);
+    } else {
+        assert(_end + i >= _data);
+        return *(_end + i);
+    }
+}
+
+char mystring::operator [] (int i) const 
+{
+    return this->at(i);
+}
+
+char& mystring::operator [] (int i)
+{
+    return this->at(i);
+}
