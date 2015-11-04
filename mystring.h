@@ -5,9 +5,6 @@
 #include <cstring>
 #include <cassert> 
 
-class rolling_checksum_a;
-class rolling_checksum_b;
-
 class mystring {
  public:
 
@@ -21,7 +18,7 @@ class mystring {
 
     int set(char* str, size_t n);
     int hash(size_t size=5);
-    int length(){ return _size; }
+    int length() const { return _size; }
 
     // functions that spec required
     int frequency(const mystring &str);
@@ -48,9 +45,9 @@ class rolling_checksum
 {
  public:
 
-    static const int _MOD = 1007;
+    static const int _MOD = 100007;
     rolling_checksum(const mystring &str, size_t n);
-    int get(){ return sum_a + (2<<16) * sum_b; }
+    int get(){ return (sum_a + (2<<16) * sum_b) % _MOD; }
     int next(char head, char tail);
     int sum_a, sum_b;
     const int size;
