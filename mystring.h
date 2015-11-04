@@ -5,6 +5,9 @@
 #include <cstring>
 #include <cassert> 
 
+class rolling_checksum_a;
+class rolling_checksum_b;
+
 class mystring {
  public:
 
@@ -36,10 +39,21 @@ class mystring {
     size_t _size;
     void reallocate();
     char& at(int i) const;
-    static const int _MOD = 1007;
     int _rolling_checksum_a(size_t len);
     int _rolling_checksum_b(size_t len);
 
+};
+
+class rolling_checksum
+{
+ public:
+
+    static const int _MOD = 1007;
+    rolling_checksum(const mystring &str, size_t n);
+    int get(){ return sum_a + (2<<16) * sum_b; }
+    int next(char head, char tail);
+    int sum_a, sum_b;
+    const int size;
 };
 
 #endif // MYSTRING_H_

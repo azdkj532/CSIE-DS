@@ -67,3 +67,27 @@ char& mystring::operator [] (int i)
 {
     return this->at(i);
 }
+
+rolling_checksum::rolling_checksum(const mystring &str, size_t n):
+    sum_a(0), sum_b(0), size(n)
+{
+    for (int i = 0; i < n; i++) {
+        sum_a += static_cast<int>(str[i]);
+        sum_b += (n-i) * static_cast<int>(str[i]);
+    }
+    sum_a %= _MOD;
+    sum_b %= _MOD;
+}
+
+int rolling_checksum::next(char head, char tail)
+{
+    sum_a -= static_cast<int>(head);
+    sum_a += static_cast<int>(tail);
+
+    sum_b -= size * static_cast<int>(head);
+    sum_b += sum_a;
+
+    sum_a %= _MOD;
+    sum_b %= _MOD;
+    return get();
+}
