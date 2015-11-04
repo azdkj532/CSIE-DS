@@ -83,6 +83,17 @@ rolling_checksum::rolling_checksum(const mystring &str, size_t n):
     sum_b %= _MOD;
 }
 
+rolling_checksum::rolling_checksum(char* begin, size_t n):
+    sum_a(0), sum_b(0), size(n)
+{
+    for (int i = 0; i < n; i++) {
+        sum_a += static_cast<int>(*(begin+i));
+        sum_b += (n-i) * static_cast<int>(*(begin+i));
+    }
+    sum_a %= _MOD;
+    sum_b %= _MOD;
+}
+
 int rolling_checksum::next(char head, char tail)
 {
     sum_a -= static_cast<int>(head);

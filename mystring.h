@@ -47,6 +47,7 @@ class rolling_checksum
 
     static const int _MOD = 100007;
     rolling_checksum(const mystring &str, size_t n);
+    rolling_checksum(char* begin, size_t n);
     int get(){ return (sum_a + (2<<16) * sum_b) % _MOD; }
     int next(char head, char tail);
     int sum_a, sum_b;
