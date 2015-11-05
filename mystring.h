@@ -28,6 +28,7 @@ class mystring {
     // overload operators
     char operator [] (int i) const;
     char& operator [] (int i);
+    bool operator== (char*);
 
     friend std::ostream& operator << (std::ostream& os, const mystring & str);
          
@@ -51,11 +52,11 @@ class rolling_checksum
     rolling_checksum(size_t n);
     ~rolling_checksum();
     bool ismatch(char c, int hash=0);
-    int hash(){ return (sum_a + (2<<16)*sum_b ) % _MOD; }
+    int hash();
     void clear() { size = 0; _bufferPtr = _buffer; }
  private:
     char* nextPtr(char *ptr);
-    char* pervPtr(char *ptr);
+    char* prevPtr(char *ptr);
 
     char *_buffer, *_bufferEnd, *_bufferPtr;
     int sum_a, sum_b;
