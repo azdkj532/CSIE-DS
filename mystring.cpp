@@ -125,9 +125,10 @@ mystring& mystring::replace(const mystring& str, const mystring& dst)
                     reallocate();
                 }
                 char *buff = new char [_size + dst.length()];
-                strncpy(buff, _data+i+str.length(), length() - i - str.length());
-                strncpy(_data+i, dst._data, dst.length());
-                strncpy(_data+i+dst.length(), buff, length() - i - str.length());
+                strncpy(buff, _data+i+1, length() - i + 1);
+                strncpy(_data+i-str.length()+1, dst._data, dst.length());
+                strncpy(_data+i+dst.length()-str.length()+1, buff, length() - i);
+                delete buff;
                 checksum.clear();
                 _size -= str.length() - dst.length();
             }
