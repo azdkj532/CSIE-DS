@@ -85,7 +85,7 @@ mystring& mystring::remove(const mystring &str)
             if (match) {
 
                 /* I can do what I want here*/
-                strncpy(_data+i-str.length(), _data+i, length()-i);
+                strncpy(_data+i-str.length()+1, _data+i+1, length()-i);
                 checksum.clear();
                 --i; // compute this byte again
                 _size -= str.length();
