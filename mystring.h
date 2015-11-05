@@ -1,7 +1,7 @@
 #ifndef MYSTRING_H_
 #define MYSTRING_H_
 
-#include <iostream>
+#include <ostream>
 #include <cstring>
 #include <cassert> 
 
@@ -28,6 +28,8 @@ class mystring {
     // overload operators
     char operator [] (int i) const;
     char& operator [] (int i);
+
+    friend std::ostream& operator << (std::ostream& os, const mystring & str);
          
  private:
 

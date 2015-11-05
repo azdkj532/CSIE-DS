@@ -146,6 +146,12 @@ char& mystring::operator [] (int i)
     return this->at(i);
 }
 
+std::ostream& operator << (std::ostream& os, const mystring & str)
+{
+    os << str._data;
+    return os;
+}
+
 /*
  * rolling checksum algorithm
  *
