@@ -18,6 +18,9 @@ void mystring::reallocate()
 }
 
 int mystring::set(char* str, size_t n) {
+    if (n >= _capacity) {
+        reallocate();
+    }
     strncpy(_data, str, n);
     _end = _data + n;
     _size = n;
@@ -156,10 +159,25 @@ char& mystring::operator [] (int i)
 
 std::ostream& operator << (std::ostream& os, const mystring & str)
 {
-    os << str._data;
+    for (int i = 0; i < str._size; i++) {
+        os << str._data[i];
+    }
     return os;
 }
 
+bool mystring::operator== (const mystring &str)
+{
+    if (str.length() == _size)
+    {
+        for (int i = 0; i < _size; i++) {
+            if (_data[i] != str[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
+}
 /*
  * rolling checksum algorithm
  *

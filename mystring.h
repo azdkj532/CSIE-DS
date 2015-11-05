@@ -28,7 +28,7 @@ class mystring {
     // overload operators
     char operator [] (int i) const;
     char& operator [] (int i);
-    bool operator== (char*);
+    bool operator== (const mystring &str);
 
     friend std::ostream& operator << (std::ostream& os, const mystring & str);
          
