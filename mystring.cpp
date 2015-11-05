@@ -4,11 +4,12 @@
 
 #include "./mystring.h"
 
+
 void mystring::reallocate() 
 {
-    size_t _new_size = _size << 1;
-    assert(_new_size >> 1 == _size);
-    char* _new_data = new char[_new_size];
+    size_t _new_capacity = _capacity << 1;
+    assert(_new_capacity >> 1 == _capacity);
+    char* _new_data = new char[_new_capacity];
     assert(_new_data != 0);
     strncpy(_new_data, _data, _size);
     delete _data;
@@ -28,15 +29,14 @@ int mystring::frequency(const mystring& str)
         // won't match any thing
         return 0;
     }
-    // initialize the rolling checksum
-    rolling_checksum checksum_target(str, str.length());
-    rolling_checksum checksum(*this, str.length());
-    int appears_amount = 0,
-        delta = this->length() - str.length();
-    for (int i = 0; i < delta; i++) {
-        checksum.next(this->at(i), this->at(i+str.length()));
-        if (checksum.get() == checksum_target.get()) {
-            // if checksum matched, we do more detailly matching test.
+    int appears_amount = 0;
+    /* initialize the rolling checksum */ 
+    rolling_checksum checksum_target(str.length());
+    int hash = checksum_target.hash();
+    rolling_checksum checksum(str.length());
+    for (int i = 0; i < length(); i++) {
+        if (checksum.ismatch(_data[i], hash)) {
+            /* if checksum matched, we do more detailly matching test. */
             bool match = true;
             for (int j = 0; j < str.length(); j++) {
                 if (at(i+j) != str[j]) {
@@ -44,11 +44,85 @@ int mystring::frequency(const mystring& str)
                 }
             }
             if (match) {
+
+                /* I can do what I want here*/
                 ++appears_amount;
+
             }
         }
     }
     return appears_amount;
+}
+
+mystring& mystring::remove(const mystring &str)
+{
+    if (length() < str.length()) {
+        // won't match any thing
+        return *this;
+    }
+    
+    /* initialize the rolling checksum */ 
+    rolling_checksum checksum_target(str.length());
+    int hash = checksum_target.hash();
+    rolling_checksum checksum(str.length());
+    for (int i = 0; i < length(); i++) {
+        if (checksum.ismatch(_data[i], hash)) {
+            /* if checksum matched, we do more detailly matching test. */
+            bool match = true;
+            for (int j = 0; j < str.length(); j++) {
+                if (at(i+j) != str[j]) {
+                    match = false;
+                }
+            }
+            if (match) {
+
+                /* I can do what I want here*/
+                strncpy(_data+i, _data+i+str.length(), length()-i-str.length());
+                checksum.clear();
+                --i; // compute this byte again
+                _size -= str.length();
+            }
+        }
+    }
+    return *this;
+}
+
+mystring& mystring::replace(const mystring& str, const mystring& dst)
+{
+    if (length() < str.length()) {
+        // won't match any thing
+        return *this;
+    }
+    
+    /* initialize the rolling checksum */ 
+    rolling_checksum checksum_target(str.length());
+    int hash = checksum_target.hash();
+    rolling_checksum checksum(str.length());
+    for (int i = 0; i < length(); i++) {
+        if (checksum.ismatch(_data[i], hash)) {
+            /* if checksum matched, we do more detailly matching test. */
+            bool match = true;
+            for (int j = 0; j < str.length(); j++) {
+                if (at(i+j) != str[j]) {
+                    match = false;
+                }
+            }
+            if (match) {
+
+                /* I can do what I want here*/
+                if (_size + dst.length() - str.length() >= _capacity) {
+                    reallocate();
+                }
+                char *buff = new char [_size + dst.length()];
+                strncpy(buff, _data+i+str.length(), length() - i - str.length());
+                strncpy(_data+i, dst._data, dst.length());
+                strncpy(_data+i+dst.length(), buff, length() - i - str.length());
+                checksum.clear();
+                _size -= str.length() - dst.length();
+            }
+        }
+    }
+    return *this;
 }
 
 char& mystring::at(int i) const
@@ -72,37 +146,65 @@ char& mystring::operator [] (int i)
     return this->at(i);
 }
 
-rolling_checksum::rolling_checksum(const mystring &str, size_t n):
-    sum_a(0), sum_b(0), size(n)
+/*
+ * rolling checksum algorithm
+ *
+ * */
+
+rolling_checksum::rolling_checksum(size_t n):
+    sum_a(0), sum_b(0), size(0)
 {
-    for (int i = 0; i < n; i++) {
-        sum_a += static_cast<int>(str[i]);
-        sum_b += (n-i) * static_cast<int>(str[i]);
-    }
-    sum_a %= _MOD;
-    sum_b %= _MOD;
+    _buffer = _bufferPtr = new char[n];
+    _bufferEnd = _buffer + n;
 }
 
-rolling_checksum::rolling_checksum(char* begin, size_t n):
-    sum_a(0), sum_b(0), size(n)
+rolling_checksum::~rolling_checksum()
 {
-    for (int i = 0; i < n; i++) {
-        sum_a += static_cast<int>(*(begin+i));
-        sum_b += (n-i) * static_cast<int>(*(begin+i));
-    }
-    sum_a %= _MOD;
-    sum_b %= _MOD;
+    delete _buffer;
 }
 
-int rolling_checksum::next(char head, char tail)
+char* rolling_checksum::nextPtr(char *ptr)
 {
-    sum_a -= static_cast<int>(head);
-    sum_a += static_cast<int>(tail);
+    return (ptr+1 >= _bufferEnd) ? _buffer : ptr+1;
+}
 
-    sum_b -= size * static_cast<int>(head);
-    sum_b += sum_a;
+char* rolling_checksum::pervPtr(char *ptr)
+{
+    return (ptr-1 < _buffer) ? _bufferEnd-1: ptr-1;
+}
 
-    sum_a %= _MOD;
-    sum_b %= _MOD;
-    return get();
+bool rolling_checksum::ismatch(char c, int hash)
+{
+    if (size < _bufferEnd - _buffer) {
+        *_bufferPtr = c;
+        ++size;
+        if (size == _bufferEnd - _buffer) {
+            // initialize the checksum list
+            char* p = pervPtr(_bufferPtr);
+            for (int i = 0; i < size; i++) {
+                sum_a += static_cast<int>(*p);
+                sum_b += (i+1) * static_cast<int>(*p);
+            }
+        }
+        _bufferPtr = nextPtr(_bufferPtr);
+        return false;
+    } else {
+        sum_a += static_cast<int>(c);
+        sum_a -= *_bufferPtr;
+
+        sum_b += sum_a;
+        sum_b -= size * static_cast<int>(c);
+
+        sum_a %= _MOD;
+        sum_b %= _MOD;
+
+        *_bufferPtr = c;
+        _bufferPtr = nextPtr(_bufferPtr);
+
+        if (hash == (sum_a + (2<<16)*sum_b)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

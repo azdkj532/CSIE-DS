@@ -33,7 +33,7 @@ class mystring {
 
     char* _data;
     char* _end;
-    size_t _size;
+    size_t _size, _capacity;
     void reallocate();
     char& at(int i) const;
     int _rolling_checksum_a(size_t len);
@@ -46,12 +46,18 @@ class rolling_checksum
  public:
 
     static const int _MOD = 100007;
-    rolling_checksum(const mystring &str, size_t n);
-    rolling_checksum(char* begin, size_t n);
-    int get(){ return (sum_a + (2<<16) * sum_b) % _MOD; }
-    int next(char head, char tail);
+    rolling_checksum(size_t n);
+    ~rolling_checksum();
+    bool ismatch(char c, int hash=0);
+    int hash(){ return (sum_a + (2<<16)*sum_b ) % _MOD; }
+    void clear() { size = 0; _bufferPtr = _buffer; }
+ private:
+    char* nextPtr(char *ptr);
+    char* pervPtr(char *ptr);
+
+    char *_buffer, *_bufferEnd, *_bufferPtr;
     int sum_a, sum_b;
-    const int size;
+    int size;
 };
 
 #endif // MYSTRING_H_
