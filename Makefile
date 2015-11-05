@@ -1,7 +1,7 @@
 CXXFLAG=-Wall -std=c++11
 
 hw1: mystring.o main.o
-	g++ -o $@  $(CXXFLAG) $?
+	g++ -o $@  $(CXXFLAG) $^
 
 main.o: main.cpp
 	g++ $(CXXFLAG) -c $<
