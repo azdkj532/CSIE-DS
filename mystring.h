@@ -8,8 +8,9 @@
 class mystring {
  public:
 
-    mystring(): _data(0), _end(0), _size(10) {
-        _data = new char[10];
+    mystring(): _data(0), _end(0), _size(0), _capacity(10) {
+        _data = new char[_capacity];
+        _end = _data;
         assert(_data != 0);
     }
     ~mystring() {

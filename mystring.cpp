@@ -8,13 +8,14 @@
 void mystring::reallocate() 
 {
     size_t _new_capacity = _capacity << 1;
-    assert(_new_capacity >> 1 == _capacity);
+    assert(_new_capacity > _capacity);
     char* _new_data = new char[_new_capacity];
     assert(_new_data != 0);
     strncpy(_new_data, _data, _size);
     delete _data;
     _data = _new_data;
-    _end = _data;
+    _end = _data + _size;
+    _capacity = _new_capacity;
 }
 
 int mystring::set(char* str, size_t n) {
