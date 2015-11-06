@@ -2,6 +2,8 @@
 
 #include "./mystring.h"
 
+#define HR_LINE cout.write("==================================================\n", 51)
+
 using std::cout;
 using std::cin;
 using std::endl;
@@ -9,7 +11,75 @@ using std::endl;
 int main(int argc, char const* argv[])
 {
 #ifndef SELF_TEST
-    cout << "hello, world" << endl;
+    HR_LINE;
+    cout.write("=               Larry's CLI editor               =\n", 51);
+    HR_LINE;
+    cout << "\x1b[36mYou can key in the source string:\x1b[0m" << endl;
+
+    mystring source;
+    char c;
+    while (cin.get(c), c != '\n') {
+        // read char into mystring until \n appears.
+        source.append(c);
+    }
+
+    bool quit = false;
+    while (!quit) {
+        //HR_LINE;
+        cout << "supported command:" << endl;
+        cout << "* searching: /<string>" << endl;
+        cout << "* replaceing: s/<target>/<dst>/" << endl;
+        cout << "* removing: s/<target>//" << endl;
+        cout << endl;
+        cout << "source string:" << endl;
+        std::cout << source << endl;
+        //HR_LINE;
+        while (cin.peek() == ' ' || cin.peek() == '\n') cin.ignore();
+        // s/asd/qwe/
+        // /asd
+        char c = cin.get();
+        if (c == '/') {
+            // searching command
+            mystring target;
+            while (cin.peek() != '\n') {
+                char t = cin.get();
+                target.append(t);
+            }
+            int f = source.frequency(target);
+            cin.ignore();
+            cout << target << " appears " << f << " times" << endl;
+        } else if(c == 's') {
+            char n = cin.get();
+            if (n == '/') {
+                // replace command
+                mystring target;
+                while (cin.peek() != '/') {
+                    char t = cin.get();
+                    if (t == '\\' && cin.peek() == '/') {
+                        t = cin.get();
+                    }
+                    target.append(t);
+                }
+                cin.ignore();
+                mystring dst;
+                while (cin.peek() != '/') {
+                    char t = cin.get();
+                    if (t == '\\' && cin.peek() == '/') {
+                        t = cin.get();
+                    }
+                    dst.append(t);
+                }
+                source.replace(target, dst);
+                cout << source << endl;
+            }
+        } else if (c == 'q'){
+            quit = true;
+        }
+        cin.unget();
+        // ignore input
+        cin.ignore(INT_MAX, '\n');
+    }
+
 #else
     char test[] = "qazwsxedcqazwsxedc";
     char target[] = "qaz";
