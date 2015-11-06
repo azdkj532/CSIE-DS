@@ -43,7 +43,7 @@ class rolling_checksum
 {
  public:
 
-    static const int _MOD = 100007;
+    static const int _MOD = 10000007;
     rolling_checksum(size_t n);
     ~rolling_checksum();
     bool ismatch(char c, int hash=0);

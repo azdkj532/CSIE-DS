@@ -231,8 +231,10 @@ bool rolling_checksum::ismatch(char c, int target)
 
 int rolling_checksum::hash()
 {
+    sum_a &= 0xFFFF;
+    sum_b &= 0x7FFF;
     if (_bufferEnd - _buffer == size) {
-        return (sum_a + (2<<16)*sum_b) % _MOD;
+        return (sum_a + (sum_b<<16)) % _MOD;
     } else {
         return 0;
     }
