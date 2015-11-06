@@ -14,7 +14,8 @@ int main(int argc, char const* argv[])
     char test[] = "qazwsxedcqazwsxedc";
     char target[] = "qaz";
     char dst[] = "1121";
-    mystring str, str2, str3;
+
+    mystring str, str2, str3, non;
     str.set(test, 18);
     str2.set(target, 3);
     str3.set(dst, 4);
@@ -26,7 +27,7 @@ int main(int argc, char const* argv[])
     char r[] = "wsxedcwsxedc";
     rem.set(r, 12);
 
-    assert(str.remove(str2) == rem);
+    assert(str.replace(str2, non) == rem);
 
     mystring rep;
     char rr[] = "1121wsxedc1121wsxedc";
@@ -36,6 +37,13 @@ int main(int argc, char const* argv[])
     str4.replace(str2, str3);
     assert(rep == str4);
 
+    mystring app;
+    app.append('1');
+    app.append('1');
+    app.append('2');
+    app.append('1');
+
+    assert(app == str3);
     cout << "All test passed!" << endl;
     return 0;
 #endif
