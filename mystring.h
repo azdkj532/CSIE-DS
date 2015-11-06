@@ -8,18 +8,12 @@
 class mystring {
  public:
 
-    mystring(): _data(0), _end(0), _size(0), _capacity(10) {
-        _data = new char[_capacity];
-        _end = _data;
-        assert(_data != 0);
-    }
-    ~mystring() {
-        delete _data;
-    }
+    mystring();
+    ~mystring();
 
     int set(char* str, size_t n);
     int hash(size_t size=5);
-    int length() const { return _size; }
+    int length() const { return _end-_data; }
 
     // functions that spec required
     int frequency(const mystring &str);
@@ -37,7 +31,7 @@ class mystring {
 
     char* _data;
     char* _end;
-    size_t _size, _capacity;
+    size_t _capacity;
     void reallocate();
     char& at(int i) const;
     int _rolling_checksum_a(size_t len);

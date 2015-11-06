@@ -4,17 +4,28 @@
 
 #include "./mystring.h"
 
+mystring::mystring(): _data(0), _end(0), _capacity(10) {
+    _data = new char[_capacity];
+    _end = _data;
+    assert(_data != 0);
+}
+
+mystring::~mystring()
+{
+    delete _data;
+}
 
 void mystring::reallocate() 
 {
-    size_t _new_capacity = _capacity << 1;
+    size_t _new_capacity = _capacity * 2;
     assert(_new_capacity > _capacity);
     char* _new_data = new char[_new_capacity];
     assert(_new_data != 0);
-    strncpy(_new_data, _data, _size);
+    size_t len = length();
+    strncpy(_new_data, _data, len);
     delete _data;
     _data = _new_data;
-    _end = _data + _size;
+    _end = _data + len;
     _capacity = _new_capacity;
 }
 
@@ -24,7 +35,6 @@ int mystring::set(char* str, size_t n) {
     }
     strncpy(_data, str, n);
     _end = _data + n;
-    _size = n;
     return 0;
 }
 
@@ -37,12 +47,12 @@ int mystring::frequency(const mystring& str)
     int appears_amount = 0;
     /* initialize the rolling checksum */ 
     rolling_checksum checksum_target(str.length());
-    for (int i = 0; i < str.length(); i++) {
+    for (int i = 0; i < str.length(); ++i) {
         checksum_target.ismatch(str[i]);
     }
     int hash = checksum_target.hash();
     rolling_checksum checksum(str.length());
-    for (int i = 0; i < length(); i++) {
+    for (int i = 0; i < length(); ++i) {
         if (checksum.ismatch(_data[i], hash)) {
             /* if checksum matched, we do more detailly matching test. */
             bool match = true;
@@ -69,12 +79,12 @@ mystring& mystring::remove(const mystring &str)
     
     /* initialize the rolling checksum */ 
     rolling_checksum checksum_target(str.length());
-    for (int i = 0; i < str.length(); i++) {
+    for (int i = 0; i < str.length(); ++i) {
         checksum_target.ismatch(str[i]);
     }
     int hash = checksum_target.hash();
     rolling_checksum checksum(str.length());
-    for (int i = 0; i < length(); i++) {
+    for (int i = 0; i < length(); ++i) {
         if (checksum.ismatch(_data[i], hash)) {
             /* if checksum matched, we do more detailly matching test. */
             bool match = true;
@@ -86,15 +96,15 @@ mystring& mystring::remove(const mystring &str)
             if (match) {
 
                 /* I can do what I want here*/
-                strncpy(_data+i-str.length()+1, _data+i+1, length()-i);
+                strncpy(_data+i-str.length()+1, _data+i+1, _end - (_data+i+1));
                 checksum.clear();
                 --i; // compute this byte again
-                _size -= str.length();
+                _end -= str.length();
             }
         }
     }
     return *this;
-}
+} // remove
 
 mystring& mystring::replace(const mystring& str, const mystring& dst)
 {
@@ -105,12 +115,12 @@ mystring& mystring::replace(const mystring& str, const mystring& dst)
     
     /* initialize the rolling checksum */ 
     rolling_checksum checksum_target(str.length());
-    for (int i = 0; i < str.length(); i++) {
+    for (int i = 0; i < str.length(); ++i) {
         checksum_target.ismatch(str[i]);
     }
     int hash = checksum_target.hash();
     rolling_checksum checksum(str.length());
-    for (int i = 0; i < length(); i++) {
+    for (int i = 0; i < length(); ++i) {
         if (checksum.ismatch(_data[i], hash)) {
             /* if checksum matched, we do more detailly matching test. */
             bool match = true;
@@ -122,16 +132,17 @@ mystring& mystring::replace(const mystring& str, const mystring& dst)
             if (match) {
 
                 /* I can do what I want here*/
-                if (_size + dst.length() - str.length() >= _capacity) {
+                if (length() + dst.length() - str.length() >= _capacity) {
                     reallocate();
                 }
-                char *buff = new char [_size + dst.length()];
-                strncpy(buff, _data+i+1, length() - i + 1);
+                int delta = dst.length() - str.length();
+                char *buff = new char [length() + dst.length()];
+                strncpy(buff, _data+i+1, _end - (_data+i+1));
                 strncpy(_data+i-str.length()+1, dst._data, dst.length());
-                strncpy(_data+i+dst.length()-str.length()+1, buff, length() - i);
+                strncpy(_data+i+delta+1, buff, _end - (_data+i+1));
                 delete buff;
                 checksum.clear();
-                _size -= str.length() - dst.length();
+                _end += delta;
             }
         }
     }
@@ -161,7 +172,7 @@ char& mystring::operator [] (int i)
 
 std::ostream& operator << (std::ostream& os, const mystring & str)
 {
-    for (int i = 0; i < str._size; i++) {
+    for (int i = 0; i < str.length(); ++i) {
         os << str._data[i];
     }
     return os;
@@ -169,9 +180,8 @@ std::ostream& operator << (std::ostream& os, const mystring & str)
 
 bool mystring::operator== (const mystring &str)
 {
-    if (str.length() == _size)
-    {
-        for (int i = 0; i < _size; i++) {
+    if (str.length() == length()) {
+        for (int i = 0; i < length(); ++i) {
             if (_data[i] != str[i]) {
                 return false;
             }
@@ -217,7 +227,7 @@ bool rolling_checksum::ismatch(char c, int target)
             // initialize the checksum list
             char* p = prevPtr(_bufferPtr);
             sum_a = sum_b = 0;
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < size; ++i) {
                 sum_a += static_cast<int>(*p);
                 sum_b += (i+1) * static_cast<int>(*p);
                 p = prevPtr(p);
