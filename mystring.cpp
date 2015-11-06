@@ -38,6 +38,15 @@ int mystring::set(char* str, size_t n) {
     return 0;
 }
 
+char mystring::append(char c)
+{
+    if (_capacity <= _end - _data) {
+        reallocate();
+    }
+    *_end++ = c;
+    return c;   
+}
+
 int mystring::frequency(const mystring& str)
 {
     if (length() < str.length()) {
@@ -69,42 +78,6 @@ int mystring::frequency(const mystring& str)
     }
     return appears_amount;
 }
-
-mystring& mystring::remove(const mystring &str)
-{
-    if (length() < str.length()) {
-        // won't match any thing
-        return *this;
-    }
-    
-    /* initialize the rolling checksum */ 
-    rolling_checksum checksum_target(str.length());
-    for (int i = 0; i < str.length(); ++i) {
-        checksum_target.ismatch(str[i]);
-    }
-    int hash = checksum_target.hash();
-    rolling_checksum checksum(str.length());
-    for (int i = 0; i < length(); ++i) {
-        if (checksum.ismatch(_data[i], hash)) {
-            /* if checksum matched, we do more detailly matching test. */
-            bool match = true;
-            for (int j = 0; j < str.length(); j++) {
-                if (at(i-j) != str[-j-1]) {
-                    match = false;
-                }
-            }
-            if (match) {
-
-                /* I can do what I want here*/
-                strncpy(_data+i-str.length()+1, _data+i+1, _end - (_data+i+1));
-                checksum.clear();
-                --i; // compute this byte again
-                _end -= str.length();
-            }
-        }
-    }
-    return *this;
-} // remove
 
 mystring& mystring::replace(const mystring& str, const mystring& dst)
 {

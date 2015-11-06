@@ -14,10 +14,10 @@ class mystring {
     int set(char* str, size_t n);
     int hash(size_t size=5);
     int length() const { return _end-_data; }
+    char append(char c);
 
     // functions that spec required
     int frequency(const mystring &str);
-    mystring& remove(const mystring &str);
     mystring& replace(const mystring& src, const mystring& dst);
 
     // overload operators
