@@ -1,5 +1,8 @@
 # Larry's editor
 
+## 編輯器
+* VIM
+
 ## 編譯環境
 需要 `make` 指令以進行編譯。
 
