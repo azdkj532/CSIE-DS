@@ -26,10 +26,10 @@ int main(int argc, char const* argv[])
     bool quit = false;
     while (!quit) {
         //HR_LINE;
-        cout << "supported command:" << endl;
+        cout << "supported command:\x1b[33m" << endl;
         cout << "* searching: /<string>" << endl;
         cout << "* replaceing: s/<target>/<dst>/" << endl;
-        cout << "* removing: s/<target>//" << endl;
+        cout << "* removing: s/<target>//\x1b[0m" << endl;
         cout << endl;
         cout << "source string:" << endl;
         std::cout << source << endl;
