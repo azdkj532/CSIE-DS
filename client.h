@@ -35,6 +35,7 @@ class Client {
      int departure_time() const;
      int service_time() const { return _service_time; }
      int arrival_time() const { return _arrival_time; }
+     int waiting_time() const { return _deadline; }
  private:
      int _arrival_time;
      int _service_time;
