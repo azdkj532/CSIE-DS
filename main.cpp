@@ -16,7 +16,10 @@ int main(int argc, char *argv[]) {
     data.push_back(empty_job);  // empty jobs
     queue.push_back(empty_job);
 
+    std::cout << "          Arrival time  Service time  Allowable waiting time" << std::endl;
+    int counter = 1;
     while (true) {
+        std::cout << "Client " << counter++ << ": ";
         int arrival, service, deadline;
         std::cin >> arrival;
         if (arrival == 0) break;
@@ -50,21 +53,21 @@ int main(int argc, char *argv[]) {
         int departure_time = (*it)->departure_time();
         std::cout << "Client " << std::setw(2) << it - data.begin() - 1 << ":";
         if (departure_time == Client::MAX_TIME) {
-#ifndef COLORFULL
+#ifdef COLORFUL
             std::cout << "\x1b[31m";
 #endif
             std::cout << std::setw(13) << "No";
-#ifndef COLORFULL
+#ifdef COLORFUL
             std::cout << "\x1b[0m";
 #endif
         } else {
             std::cout << std::setw(13) << "Yes";
             if (departure_time > (*it)->arrival_time() + (*it)->waiting_time()) {
-#ifndef COLORFULL
+#ifdef COLORFUL
                 std::cout << "\x1b[31m";
 #endif
                 std::cout << std::setw(10) << departure_time;
-#ifndef COLORFULL
+#ifdef COLORFUL
                 std::cout << "\x1b[0m";
 #endif
             } else {

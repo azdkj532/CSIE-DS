@@ -1,4 +1,4 @@
-CXXFLAG = --std=c++11 -Wall
+CXXFLAG = --std=c++11 -Wall -DCOLORFUL
 #CC = /usr/local/Cellar/gcc/5.2.0/bin/g++-5
 CC = g++
 
