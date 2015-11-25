@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <vector>
 
 #include "./client.h"
@@ -44,10 +45,19 @@ int main(int argc, char *argv[]) {
             queue.push_back(least);
         }
     }
-    for (auto it : data) {
-        std::cout << it->arrival_time() << " " << it->service_time() << " ";
-        std::cout << it->departure_time() << std::endl;
+    std::cout << "          Serverd or not?   Departure time" << std::endl;   
+    for (auto it=data.begin()+2; it != data.end(); ++it) {
+        int departure_time = (*it)->departure_time();
+        std::cout << "Client " << std::setw(2) << it - data.begin() - 1 << ":";
+        if (departure_time == Client::MAX_TIME) {
+            std::cout << std::setw(13) << "No";
+        } else {
+            std::cout << std::setw(13) << "Yes";
+            std::cout << std::setw(10) << departure_time;
+        }
+        std::cout << std::endl;
     }
+    // release all memory
     for (auto it : data) {
         delete it;
     }
