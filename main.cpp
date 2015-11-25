@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
         } else {
             Client* least = queue.back();
             queue.pop_back();
-            if (client->deadline_test(queue.back()->departure_time()) && 
+            if (client->deadline_test(queue.back()->departure_time()) &&
                     least->deadline_test(
                         std::max(client->arrival_time(), queue.back()->departure_time()) + client->service_time())) {
                 // new client cut in to the queue, both least client and it meet their deadline
@@ -45,15 +45,31 @@ int main(int argc, char *argv[]) {
             queue.push_back(least);
         }
     }
-    std::cout << "          Serverd or not?   Departure time" << std::endl;   
+    std::cout << "          Serverd or not?   Departure time" << std::endl;
     for (auto it=data.begin()+2; it != data.end(); ++it) {
         int departure_time = (*it)->departure_time();
         std::cout << "Client " << std::setw(2) << it - data.begin() - 1 << ":";
         if (departure_time == Client::MAX_TIME) {
+#ifndef COLORFULL
+            std::cout << "\x1b[31m";
+#endif
             std::cout << std::setw(13) << "No";
+#ifndef COLORFULL
+            std::cout << "\x1b[0m";
+#endif
         } else {
             std::cout << std::setw(13) << "Yes";
-            std::cout << std::setw(10) << departure_time;
+            if (departure_time > (*it)->arrival_time() + (*it)->waiting_time()) {
+#ifndef COLORFULL
+                std::cout << "\x1b[31m";
+#endif
+                std::cout << std::setw(10) << departure_time;
+#ifndef COLORFULL
+                std::cout << "\x1b[0m";
+#endif
+            } else {
+                std::cout << std::setw(10) << departure_time;
+            }
         }
         std::cout << std::endl;
     }
