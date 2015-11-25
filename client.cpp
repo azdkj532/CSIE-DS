@@ -4,7 +4,7 @@
 
 bool Client::deadline_test(int time) {
     // test client will meet deadline or not when it starts at `time`
-    if (std::max(_arrival_time, time) + _service_time <= _arrival_time + _deadline) {
+    if (std::max(_arrival_time, time) <= _arrival_time + _deadline) {
         return true;
     }
     return false;
