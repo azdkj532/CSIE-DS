@@ -1,6 +1,8 @@
 
 # Larry's scheduler
 
+[Github repo](https://github.com/azdkj532/CSIE-DS/tree/hw2)
+
 ## 編輯器
 * VIM
 
@@ -36,4 +38,4 @@ make
 直接輸入 0 終止輸入，開始計算排程。
 
 ## 截圖
-![螢幕截圖]()
+![螢幕截圖](https://raw.githubusercontent.com/azdkj532/CSIE-DS/hw2/screenshot.png)
