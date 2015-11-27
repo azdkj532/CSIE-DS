@@ -26,6 +26,9 @@ int main(int argc, char *argv[]) {
         std::cin >> service >> deadline;
         Client *client = new Client(arrival, service, deadline);
         data.push_back(client);
+    }
+    for (auto it = data.begin()+2; it != data.end(); ++it) {
+        Client * client = *it;
         if (client->deadline_test(queue.back()->departure_time())) {
             // clien found it can meet its deadline
             // client join the procession at the end
@@ -81,5 +84,6 @@ int main(int argc, char *argv[]) {
         delete it;
     }
     data.clear();
+    queue.clear();
     return 0;
 }
