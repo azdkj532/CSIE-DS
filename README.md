@@ -1,7 +1,7 @@
 
 # Larry's scheduler
 
-[Github repo](https://github.com/azdkj532/CSIE-DS/tree/hw2)
+Github repo: <https://github.com/azdkj532/CSIE-DS/tree/hw2>
 
 ## 編輯器
 * VIM
