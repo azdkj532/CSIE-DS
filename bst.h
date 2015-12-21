@@ -1,7 +1,9 @@
 #ifndef BST_H_
 #define BST_H_
 
+#include <cassert>
 #include <cctype>
+#include <algorithm>
 
 template<typename T>
 class BSTree;
@@ -91,6 +93,22 @@ class BSTree {
     };
 
     bool empty() { return _root == 0; }
+    iterator& begin() {
+        assert(_root != 0);
+        iterator it(_root), root(_root);
+        while (it.prev() != root) {
+            it = it.prev();
+        }
+        return it;
+    }
+    iterator& end() {
+        assert(_root != 0);
+        iterator it(_root), root(_root);
+        while (it.next() != root) {
+            it = it.next();
+        }
+        return it;
+    }
     bool find(const T& source, iterator& it ) {
         if (empty()) {
             return false;
