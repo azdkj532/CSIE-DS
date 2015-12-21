@@ -148,6 +148,48 @@ class BSTree {
             }
         }
     }
+
+    bool remove(const T& source) {
+        iterator it;
+        bool isFind = find(source, it);
+
+        if (isFind) {
+            return remove(it);
+        }
+        return false;
+    }
+
+    void remove(iterator& it) {
+        BSTNode<T> * currentNode = it._node;
+        if (!currentNode->isRightThread()) {
+            iterator s = it.next();
+            std::swap(*s, *it);
+            std::swap(s._node->_repeat, it._node->_repeat);
+            remove(s);
+        } else if (!currentNode->isRightThread()) {
+            iterator s = it.prev();
+            std::swap(*s, *it);
+            std::swap(s._node->_repeat, it._node->_repeat);
+            remove(s);
+        } else {
+            // delete a leaf node
+            BSTNode<T> * nextNode = it.next()._node;
+            BSTNode<T> * prevNode = it.prev()._node;
+            if (nextNode == it._node) {
+                // root node
+                delete _root;
+                _root = 0;
+            } else if (nextNode->leftChild() == it._node) {
+                nextNode->leftChild(it._node->leftChild());
+                nextNode->setLeftFlag(true);
+                delete it._node;
+            } else if (prevNode->rightChild()) {
+                prevNode->rightChild(it._node->rightChild());
+                prevNode->setRightFlag(true);
+                delete it._node;
+            }
+        }
+    }
 };
 
 #endif  // BST_H_
