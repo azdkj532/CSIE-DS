@@ -181,28 +181,28 @@ class BSTree {
         bool isFind = find(source, it);
 
         if (isFind) {
-            --it._node->_repeat;
-            if (it._node->_repeat == 0)
-                remove(it);
+            remove(it);
         }
     }
 
     void remove(iterator& it) {
         BSTNode<T> * currentNode = it._node;
-        if (!currentNode->isRightThread()) {
-            iterator s = it.next();
+        if (currentNode->_repeat > 1) {
+            --currentNode->_repeat;
+        } else if (!currentNode->isRightThread()) {
+            iterator s = iterator(it.next());
             std::swap(*s, *it);
             std::swap(s._node->_repeat, it._node->_repeat);
             remove(s);
         } else if (!currentNode->isRightThread()) {
-            iterator s = it.prev();
+            iterator s = iterator(it.prev());
             std::swap(*s, *it);
             std::swap(s._node->_repeat, it._node->_repeat);
             remove(s);
         } else {
             // delete a leaf node
-            BSTNode<T> * nextNode = it.next()._node;
-            BSTNode<T> * prevNode = it.prev()._node;
+            BSTNode<T> * nextNode = it.next();
+            BSTNode<T> * prevNode = it.prev();
             if (nextNode == it._node) {
                 // root node
                 delete _root;
