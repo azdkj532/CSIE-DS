@@ -96,7 +96,7 @@ class BSTree {
     };
 
     bool empty() { return _root == 0; }
-    iterator begin() {
+    iterator bottom() {
         assert(_root != 0);
         iterator it(_root);
         while (it.prev() != _root) {
@@ -104,7 +104,7 @@ class BSTree {
         }
         return it;
     }
-    iterator end() {
+    iterator top() {
         assert(_root != 0);
         iterator it(_root);
         while (it.next() != _root) {
@@ -112,6 +112,8 @@ class BSTree {
         }
         return it;
     }
+    void pop() { auto it = top(); remove(it); }
+    
     bool find(const T& source, iterator& it ) {
         if (empty()) {
             return false;
