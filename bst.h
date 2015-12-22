@@ -4,6 +4,8 @@
 #include <cassert>
 #include <cctype>
 #include <algorithm>
+#include <iostream>
+#include <queue>
 
 template<typename T>
 class BSTree;
@@ -93,7 +95,47 @@ class BSTree {
 
         bool operator== (const iterator& it) const { return (it._node == _node); }
         bool operator!= (const iterator& it) const { return !(it == *(this)); }
+
+        iterator lchild() {
+            if (_node->isLeftThread()) {
+                return iterator(0);
+            } else {
+                return iterator(_node->leftChild());
+            }
+        }
+        iterator rchild() {
+            if (_node->isRightThread()) {
+                return iterator(0);
+            } else {
+                return iterator(_node->rightChild());
+            }
+        }
     };
+
+    friend std::ostream& operator<< (std::ostream& os, BSTree<T>& bst) {
+        std::queue<BSTree<T>::iterator> q;
+        int stage = 1, next_stage = 0;
+        q.push(BSTree<T>::iterator(bst._root));
+        static const BSTree<T>::iterator nul = BSTree<T>::iterator(0);
+        while (!q.empty()) {
+            BSTree<T>::iterator it = q.front();
+            q.pop();
+            if (it._node != 0) {
+                os << *it << " ";
+                q.push(it.lchild());
+                q.push(it.rchild());
+                next_stage += 2;
+            } else {
+                os << "X ";
+            }
+            if (!--stage) {
+                os << std::endl;
+                stage = next_stage;
+                next_stage = 0;
+            }
+        }
+        return os;
+    }
 
     bool empty() { return _root == 0; }
     iterator bottom() {
@@ -219,5 +261,6 @@ class BSTree {
         }
     }
 };
+
 
 #endif  // BST_H_
