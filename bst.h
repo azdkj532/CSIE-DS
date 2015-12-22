@@ -22,14 +22,14 @@ class BSTNode {
  public:
     explicit BSTNode(const T& value = 0): _value(value), _left(0), _right(0), _repeat(1) {}
 
-    BSTNode<T> * leftChild() {return static_cast<BSTNode<T>*>(_left & MASK); }
-    BSTNode<T> * rightChild() {return static_cast<BSTNode<T>*>(_right & MASK); }
+    BSTNode<T> * leftChild() {return reinterpret_cast<BSTNode<T>*>(_left & MASK); }
+    BSTNode<T> * rightChild() {return reinterpret_cast<BSTNode<T>*>(_right & MASK); }
     BSTNode<T> * leftChild(BSTNode<T> * newPtr) {
-        _left = static_cast<size_t>(newPtr) | (_left & 1);
+        _left = reinterpret_cast<size_t>(newPtr) | (_left & 1);
         return this;
     }
     BSTNode<T> * rightChild(BSTNode<T> * newPtr) {
-        _right = static_cast<size_t>(newPtr) | (_right & 1);
+        _right = reinterpret_cast<size_t>(newPtr) | (_right & 1);
         return this;
     }
 
@@ -50,6 +50,7 @@ class BSTree {
     BSTree(): _root(0) {}
 
     class iterator {
+        friend class BSTree<T>;
         BSTNode<T> * _node;
 
         BSTNode<T> * next() {
@@ -59,7 +60,7 @@ class BSTree {
             } else {
                 // right child
                 BSTNode<T> * current = _node->rightChild();
-                while (current->isLeftThread())
+                while (!current->isLeftThread())
                     current = current->leftChild();
                 return current;
             }
@@ -71,41 +72,43 @@ class BSTree {
             } else {
                 // left child
                 BSTNode<T> * current = _node->leftChild();
-                while (current->isLeftThread())
-                    current = current->leftChild();
+                while (!current->isRightThread())
+                    current = current->rightChild();
                 return current;
             }
         }
+
      public:
         explicit iterator(BSTNode<T> * ptr = 0): _node(ptr) {}
         iterator(const iterator & it): _node(it._node) {}
+        ~iterator() {}
 
-        const T& operator * () const { return _node->_value; }
+        const T operator * () const { return _node->_value; }
         T& operator * () { return _node->_value; }
         iterator& operator = (const iterator & it) { _node = it._node; return *this; }
-        iterator& operator++ () { _node = next(); return _node; }
-        iterator& operator++ (int o) { BSTNode<T> * ret = _node; _node = next(); return ret; }
-        iterator& operator-- () { _node = prev(); return _node; }
-        iterator& operator-- (int o) { BSTNode<T> * ret = _node; _node = prev(); return ret; }
+        iterator& operator++ () { _node = next(); return *(this); }
+        iterator operator++ (int) { auto ret = *(this); _node = next(); return ret; }
+        iterator& operator-- () { _node = prev(); return *(this); }
+        iterator operator-- (int) { auto ret = *(this); _node = prev(); return ret; }
 
-        bool operator== (const iterator& it) { return (it._node == _node); }
-        bool operator!= (const iterator& it) { return !(it == *(this)); }
+        bool operator== (const iterator& it) const { return (it._node == _node); }
+        bool operator!= (const iterator& it) const { return !(it == *(this)); }
     };
 
     bool empty() { return _root == 0; }
-    iterator& begin() {
+    iterator begin() {
         assert(_root != 0);
-        iterator it(_root), root(_root);
-        while (it.prev() != root) {
-            it = it.prev();
+        iterator it(_root);
+        while (it.prev() != _root) {
+            it._node = it.prev();
         }
         return it;
     }
-    iterator& end() {
+    iterator end() {
         assert(_root != 0);
-        iterator it(_root), root(_root);
-        while (it.next() != root) {
-            it = it.next();
+        iterator it(_root);
+        while (it.next() != _root) {
+            it._node = it.next();
         }
         return it;
     }
@@ -122,17 +125,19 @@ class BSTree {
             } else if (currentNode->_value < source) {
                 if (currentNode->isRightThread())
                     break;
-                currentNode = currentNode->rightChild();
+                else
+                    currentNode = currentNode->rightChild();
             } else {
                 if (currentNode->isLeftThread())
                     break;
-                currentNode = currentNode->leftChild();
+                else
+                    currentNode = currentNode->leftChild();
             }
         }
         it = iterator(currentNode);
         return false;
     }
-    iterator& insert(const T& source) {
+    iterator insert(const T& source) {
         if (empty()) {
             // create vary first node
             _root = new BSTNode<T>(source);
@@ -140,7 +145,7 @@ class BSTree {
             _root->setRightFlag(true);
             _root->leftChild(_root);
             _root->setLeftFlag(true);
-            return iterator(_root);
+            return BSTree<T>::iterator(_root);
         }
 
         BSTree<T>::iterator it;
@@ -148,33 +153,36 @@ class BSTree {
         if (isFind) {
             //just increase repeat amount
             ++it._node->_repeat;
+            return it;
         } else {
             BSTNode<T> * currentNode = it._node;
             BSTNode<T> * newNode = new BSTNode<T>(source);
+            newNode->setRightFlag(true);
+            newNode->setLeftFlag(true);
             if (*it < source) {
                 newNode->rightChild(currentNode->rightChild());
-                newNode->setRightFlag(true);
                 newNode->leftChild(currentNode);
-                newNode->setLeftFlag(true);
+                currentNode->rightChild(newNode);
                 currentNode->setRightFlag(false);
             } else {
                 newNode->leftChild(currentNode->leftChild());
-                newNode->setLeftFlag(true);
                 newNode->rightChild(currentNode);
-                newNode->setRightFlag(true);
+                currentNode->leftChild(newNode);
                 currentNode->setLeftFlag(false);
             }
+            return iterator(newNode);
         }
     }
 
-    bool remove(const T& source) {
+    void remove(const T& source) {
         iterator it;
         bool isFind = find(source, it);
 
         if (isFind) {
-            return remove(it);
+            --it._node->_repeat;
+            if (it._node->_repeat == 0)
+                remove(it);
         }
-        return false;
     }
 
     void remove(iterator& it) {
