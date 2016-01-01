@@ -43,10 +43,12 @@ class BSTNode {
     void setLeftFlag(bool f) { _left = (_left & MASK) | f; }
 
     inline bool isLeaf() { return isLeftThread() && isRightThread(); }
+    T& value() { return _value; }
 };
 
 template<typename T>
 class BSTree {
+ protected:
     BSTNode<T> * _root;
 
  public:
@@ -195,28 +197,22 @@ class BSTree {
 
         BSTree<T>::iterator it;
         bool isFind = find(source, it);
-        if (isFind) {
-            //just increase repeat amount
-            ++it._node->_repeat;
-            return it;
+        BSTNode<T> * currentNode = it._node;
+        BSTNode<T> * newNode = new BSTNode<T>(source);
+        newNode->setRightFlag(true);
+        newNode->setLeftFlag(true);
+        if (*it < source) {
+            newNode->rightChild(currentNode->rightChild());
+            newNode->leftChild(currentNode);
+            currentNode->rightChild(newNode);
+            currentNode->setRightFlag(false);
         } else {
-            BSTNode<T> * currentNode = it._node;
-            BSTNode<T> * newNode = new BSTNode<T>(source);
-            newNode->setRightFlag(true);
-            newNode->setLeftFlag(true);
-            if (*it < source) {
-                newNode->rightChild(currentNode->rightChild());
-                newNode->leftChild(currentNode);
-                currentNode->rightChild(newNode);
-                currentNode->setRightFlag(false);
-            } else {
-                newNode->leftChild(currentNode->leftChild());
-                newNode->rightChild(currentNode);
-                currentNode->leftChild(newNode);
-                currentNode->setLeftFlag(false);
-            }
-            return iterator(newNode);
+            newNode->leftChild(currentNode->leftChild());
+            newNode->rightChild(currentNode);
+            currentNode->leftChild(newNode);
+            currentNode->setLeftFlag(false);
         }
+        return iterator(newNode);
     }
 
     void remove(const T& source) {

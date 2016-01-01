@@ -27,28 +27,16 @@ std::ostream& operator<< (std::ostream &os, const count &a) {
 class MyBST: public BSTree<count> {
     typedef BSTNode<count> element;
  public:
-    void counting() {
-        std::stack<element*> stk;
-        stk.push(_root);
-        while (!stk.empty()) {
-            element * node = stk.top();
-            if (node->value().visit == 1) {
-                stk.pop();
-                if (!node->isLeftThread()) {
-                    node->value().left = node->leftChild()->value().total();
-                }
-                if (!node->isRightThread()) {
-                    node->value().right = node->rightChild()->value().total();
-                }
-            } else {
-                if (!node->isLeftThread()) {
-                    stk.push(node->leftChild());
-                }
-                if (!node->isRightThread()) {
-                    stk.push(node->rightChild());
-                }
-                node->value().visit = 1;
-            }
+    void counting(element* current=0) {
+        if (current == 0) current = _root;
+        if (current->isLeaf()) return;
+        if (!current->isLeftThread()) {
+            counting(current->leftChild());
+            current->value().left = current->leftChild()->value().total();
+        }
+        if (!current->isRightThread()) {
+            counting(current->rightChild());
+            current->value().right = current->rightChild()->value().total();
         }
     }
     std::ostream& level_order_output(std::ostream &os) {
@@ -88,6 +76,33 @@ int main(int argc, char const* argv[]) {
 
     bst.counting();
     bst.level_order_output(cout) << endl;
-    cout << bst << endl;
+
+    while (true) {
+        cout << "the average of the lagrest kth elements. Input k (-1 to exit):" << endl;
+        int k;
+        cin >> k;
+        if (k == -1)
+            break;
+        int sum = 0, countable = 0;
+        auto it = bst.top();
+        for (int i = 0; i < k; i++) {
+            sum += (*it).value;
+            if (it == bst.bottom()) {
+                countable = false;
+                break;
+            } else {
+                countable = true;
+                --it;
+            }
+        }
+
+        cout << "average is ";
+        if (countable) {
+            cout << (double)sum / k << endl;
+        } else {
+            cout << -1 << endl;
+        }
+
+    }
     return 0;
 }
