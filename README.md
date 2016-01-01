@@ -1,3 +1,4 @@
+*看不懂就不要抄 謝謝合作*
 ## Environment
 * OS: OSX El capitan
 * Compiler: LLVM, GNU g++
@@ -9,4 +10,4 @@
 
 接下來輸入正整數 k , 輸出前 k 個元素之平均。
 
-# 看不懂就不要抄 謝謝合作
+
